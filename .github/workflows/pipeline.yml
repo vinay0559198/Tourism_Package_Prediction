@@ -1,0 +1,49 @@
+name: Machine Learning Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  data-ingestion:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Dependencies
+        run: pip install pandas datasets
+      - name: Load Data
+        run: python src/data_ingestion.py
+
+  data-preprocessing:
+    needs: data-ingestion
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Preprocess Data
+        run: python src/data_preprocessing.py
+
+  model-training:
+    needs: data-preprocessing
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Train Model
+        run: python src/model_training.py
+
+  model-evaluation:
+    needs: model-training
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Evaluate Model
+        run: python src/model_evaluation.py
+
+  model-deployment:
+    needs: model-evaluation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploy Model
+        run: python src/deploy_model.py
