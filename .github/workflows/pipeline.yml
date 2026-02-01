@@ -4,46 +4,60 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
-
-  data-ingestion:
+  ml_pipeline:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Install Dependencies
-        run: pip install pandas datasets
-      - name: Load Data
-        run: python src/data_ingestion.py
 
-  data-preprocessing:
-    needs: data-ingestion
-    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Preprocess Data
-        run: python src/data_preprocessing.py
+    # 1️⃣ Checkout Repository
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-  model-training:
-    needs: data-preprocessing
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Train Model
-        run: python src/model_training.py
+    # 2️⃣ Setup Python Environment
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
 
-  model-evaluation:
-    needs: model-training
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Evaluate Model
-        run: python src/model_evaluation.py
+    # 3️⃣ Install Dependencies
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-  model-deployment:
-    needs: model-evaluation
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Deploy Model
-        run: python src/deploy_model.py
+    # 4️⃣ Data Ingestion
+    - name: Data Ingestion
+      run: |
+        python src/data_ingestion.py
+
+    # 5️⃣ Data Validation
+    - name: Data Validation
+      run: |
+        python src/data_validation.py
+
+    # 6️⃣ Data Preprocessing
+    - name: Data Preprocessing
+      run: |
+        python src/data_preprocessing.py
+
+    # 7️⃣ Feature Engineering
+    - name: Feature Engineering
+      run: |
+        python src/feature_engineering.py
+
+    # 8️⃣ Model Training
+    - name: Model Training
+      run: |
+        python src/model_training.py
+
+    # 9️⃣ Model Evaluation
+    - name: Model Evaluation
+      run: |
+        python src/model_evaluation.py
+
+    # 🔟 Save / Register Model
+    - name: Save Model
+      run: |
+        python src/model_saving.py
